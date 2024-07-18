@@ -8,7 +8,12 @@ import os
 from datetime import datetime
 from .models import Fixture
 from .models import Team, Player, PlayerPosition, GameweekStats
-from .serializers import PlayerSerializer  # Assuming you have a serializer
+from .serializers import (
+    PlayerSerializer,
+    TeamSerializer,
+    SingularTeamSerializer,
+    PlayerListSerializer,
+)  # Assuming you have a serializer
 
 
 load_dotenv()
@@ -410,3 +415,42 @@ class PlayersByPositionAPIView(views.APIView):
                 {"error": "Players not found for the given element_type"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+
+
+class TeamListAPIView(views.APIView):
+    def get(self, request):
+        teams = Team.objects.all()
+        serializer = TeamSerializer(teams, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TeamDetailAPIView(views.APIView):
+    def get(self, request):
+        team_id = request.query_params.get("team_id")
+        if not team_id:
+            return Response(
+                {"error": "Team id is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            team = Team.objects.get(id=team_id)
+        except Team.DoesNotExist:
+            return Response(
+                {"error": "Team not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = SingularTeamSerializer(team)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TeamPlayersAPIView(views.APIView):
+    def get(self, request):
+        team_id = request.query_params.get("team_id")
+        if not team_id:
+            return Response(
+                {"error": "Team id is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        players = Player.objects.filter(team=team_id)
+        serializer = PlayerListSerializer(players, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

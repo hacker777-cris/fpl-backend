@@ -7,4 +7,7 @@ urlpatterns = [
     path("update-fixtures/", views.UpdateFixturesView.as_view()),
     path("update-data/", views.UpdateDataView.as_view()),
     path("player-by-position/", views.PlayersByPositionAPIView.as_view()),
+    path("get-teams/", views.TeamListAPIView.as_view()),
+    path("get-single-team/", views.TeamDetailAPIView.as_view()),
+    path("team-players/", views.TeamPlayersAPIView.as_view(), name="team-players"),
 ]

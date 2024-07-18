@@ -5,7 +5,13 @@ from .models import Team, PlayerPosition, Player, GameweekStats
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = "__all__"
+        fields = ["id", "name"]
+
+
+class SingularTeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = "__all__"  # Include all fields
 
 
 class PlayerPositionSerializer(serializers.ModelSerializer):
@@ -18,6 +24,17 @@ class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = "__all__"  # Serialize all fields of the Player model
+
+
+class PlayerListSerializer(serializers.ModelSerializer):
+    now_cost = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Player
+        fields = ["id", "web_name", "now_cost"]  # Include id, name, and now_cost
+
+    def get_now_cost(self, obj):
+        return f"{obj.now_cost / 10:.1f}"  # Divide by 10 and format to 1 decimal place
 
 
 class GameweekStatsSerializer(serializers.ModelSerializer):
