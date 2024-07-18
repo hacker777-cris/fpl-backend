@@ -3,15 +3,25 @@ from .models import Team, PlayerPosition, Player, GameweekStats
 
 
 class TeamSerializer(serializers.ModelSerializer):
+    logo_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Team
-        fields = ["id", "name"]
+        fields = ["id", "name", "logo_url"]  # Include id, name, and logo_url
+
+    def get_logo_url(self, obj):
+        return f"https://resources.premierleague.com/premierleague/badges/70/t{obj.code}.png"
 
 
 class SingularTeamSerializer(serializers.ModelSerializer):
+    logo_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Team
         fields = "__all__"  # Include all fields
+
+    def get_logo_url(self, obj):
+        return f"https://resources.premierleague.com/premierleague/badges/70/t{obj.code}.png"
 
 
 class PlayerPositionSerializer(serializers.ModelSerializer):
@@ -28,13 +38,22 @@ class PlayerSerializer(serializers.ModelSerializer):
 
 class PlayerListSerializer(serializers.ModelSerializer):
     now_cost = serializers.SerializerMethodField()
+    photo_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Player
-        fields = ["id", "web_name", "now_cost"]  # Include id, name, and now_cost
+        fields = [
+            "id",
+            "web_name",
+            "now_cost",
+            "photo_url",
+        ]  # Include id, web_name, now_cost, and photo_url
 
     def get_now_cost(self, obj):
         return f"{obj.now_cost / 10:.1f}"  # Divide by 10 and format to 1 decimal place
+
+    def get_photo_url(self, obj):
+        return f"https://resources.premierleague.com/premierleague/photos/players/110x140/p{obj.code}.png"
 
 
 class GameweekStatsSerializer(serializers.ModelSerializer):
