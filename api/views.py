@@ -454,3 +454,23 @@ class TeamPlayersAPIView(views.APIView):
         players = Player.objects.filter(team=team_id)
         serializer = PlayerListSerializer(players, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class PlayerDetailView(views.APIView):
+    def get(self, request):
+        player_id = request.query_params.get("player_id")
+
+        if not player_id:
+            return Response(
+                {"error": "Player ID is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            player = Player.objects.get(id=player_id)
+        except Player.DoesNotExist:
+            return Response(
+                {"error": "Player not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = PlayerSerializer(player)
+        return Response(serializer.data, status=status.HTTP_200_OK)
