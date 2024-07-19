@@ -495,9 +495,9 @@ class PlayerDetailView(views.APIView):
         fixtures = fixtures_data.get("fixtures", [])
         fixture_info = []
 
-        # Create a mapping of team IDs to team names
+        # Create a mapping of team IDs to team short names
         teams = Team.objects.all()
-        team_mapping = {team.id: team.name for team in teams}
+        team_mapping = {team.id: team.short_name for team in teams}
 
         for fixture in fixtures:
             opponent_team_id = (
