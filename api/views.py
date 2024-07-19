@@ -472,5 +472,49 @@ class PlayerDetailView(views.APIView):
                 {"error": "Player not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
-        serializer = PlayerSerializer(player)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # Serialize the player data
+        player_serializer = PlayerSerializer(player)
+        player_data = player_serializer.data
+
+        # Fetch player fixtures
+        fixtures_url = (
+            f"https://fantasy.premierleague.com/api/element-summary/{player_id}/"
+        )
+        try:
+            fixtures_response = requests.get(fixtures_url)
+            fixtures_response.raise_for_status()
+            fixtures_data = fixtures_response.json()
+        except requests.RequestException as e:
+            return Response(
+                {"error": f"Failed to fetch player fixtures: {e}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        # Extract player team and fixture information
+        player_team_id = player_data.get("team")
+        fixtures = fixtures_data.get("fixtures", [])
+        fixture_info = []
+
+        # Create a mapping of team IDs to team names
+        teams = Team.objects.all()
+        team_mapping = {team.id: team.name for team in teams}
+
+        for fixture in fixtures:
+            opponent_team_id = (
+                fixture.get("team_a")
+                if fixture.get("team_h") == player_team_id
+                else fixture.get("team_h")
+            )
+            if opponent_team_id:
+                fixture_info.append(
+                    {
+                        "event_name": fixture.get("event_name"),
+                        "opponent_team": team_mapping.get(opponent_team_id, "Unknown"),
+                        "difficulty": fixture.get("difficulty"),
+                    }
+                )
+
+        # Combine player data with filtered fixture info
+        player_data["fixtures"] = fixture_info
+
+        return Response(player_data, status=status.HTTP_200_OK)
