@@ -49,6 +49,7 @@ class PlayerListSerializer(serializers.ModelSerializer):
             "photo_url",
             "first_name",
             "second_name",
+            "code",
         ]  # Include id, web_name, now_cost, and photo_url
 
     def get_now_cost(self, obj):
