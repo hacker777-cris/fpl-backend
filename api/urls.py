@@ -11,4 +11,5 @@ urlpatterns = [
     path("get-single-team/", views.TeamDetailAPIView.as_view()),
     path("team-players/", views.TeamPlayersAPIView.as_view(), name="team-players"),
     path("player/", views.PlayerDetailView.as_view(), name="player-detail"),
+    path("all-players/", views.GetAllPlayers.as_view(), name="all-players"),
 ]

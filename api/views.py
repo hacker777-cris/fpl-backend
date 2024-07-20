@@ -6,6 +6,8 @@ from collections import defaultdict
 from dotenv import load_dotenv
 import os
 from datetime import datetime
+
+from rest_framework.utils.representation import serializer_repr
 from .models import Fixture
 from .models import Team, Player, PlayerPosition, GameweekStats
 from .serializers import (
@@ -14,7 +16,9 @@ from .serializers import (
     SingularTeamSerializer,
     PlayerListSerializer,
 )  # Assuming you have a serializer
+import logging
 
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -518,3 +522,25 @@ class PlayerDetailView(views.APIView):
         player_data["fixtures"] = fixture_info
 
         return Response(player_data, status=status.HTTP_200_OK)
+
+
+class GetAllPlayers(views.APIView):
+    def get(self, request):
+        try:
+            players = Player.objects.all()
+            serializer = PlayerSerializer(players, many=True)
+            return Response(
+                {"success": True, "data": serializer.data}, status=status.HTTP_200_OK
+            )
+        except Player.DoesNotExist:
+            logger.error("Players not found")
+            return Response(
+                {"success": False, "error": "Players not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            logger.error(f"An error occurred: {e}")
+            return Response(
+                {"success": False, "error": "An error occurred while fetching players"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
