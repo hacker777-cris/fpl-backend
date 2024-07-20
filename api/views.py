@@ -504,17 +504,19 @@ class PlayerDetailView(views.APIView):
         team_mapping = {team.id: team.short_name for team in teams}
 
         for fixture in fixtures:
+            is_home = fixture.get("team_h") == player_team_id
             opponent_team_id = (
-                fixture.get("team_a")
-                if fixture.get("team_h") == player_team_id
-                else fixture.get("team_h")
+                fixture.get("team_a") if is_home else fixture.get("team_h")
             )
+            fixture_type = "home" if is_home else "away"
+
             if opponent_team_id:
                 fixture_info.append(
                     {
                         "event_name": fixture.get("event_name"),
                         "opponent_team": team_mapping.get(opponent_team_id, "Unknown"),
                         "difficulty": fixture.get("difficulty"),
+                        "fixture_type": fixture_type,
                     }
                 )
 
