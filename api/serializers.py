@@ -7,7 +7,12 @@ class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ["id", "name", "logo_url"]  # Include id, name, and logo_url
+        fields = [
+            "id",
+            "name",
+            "logo_url",
+            "short_name",
+        ]  # Include id, name, and logo_url
 
     def get_logo_url(self, obj):
         return f"https://resources.premierleague.com/premierleague/badges/70/t{obj.code}.png"
