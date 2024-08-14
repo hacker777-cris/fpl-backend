@@ -12,6 +12,7 @@ class TeamSerializer(serializers.ModelSerializer):
             "name",
             "logo_url",
             "short_name",
+            "strength",
         ]  # Include id, name, and logo_url
 
     def get_logo_url(self, obj):
